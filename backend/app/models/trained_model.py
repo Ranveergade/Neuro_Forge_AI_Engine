@@ -27,6 +27,11 @@ class TrainedModel(Base):
         String(200),
         nullable=False
     )
+    version = Column(
+    String(50),
+    nullable=False,
+    default="v1"
+)
 
     algorithm = Column(
         String(100),

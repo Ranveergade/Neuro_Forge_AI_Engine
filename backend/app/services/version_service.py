@@ -3,6 +3,7 @@ import pandas as pd
 from fastapi import HTTPException
 
 from app.models.dataset_version import DatasetVersion
+from app.models.trained_model import TrainedModel
 def get_latest_version(
     dataset_id: int,
     db: Session
@@ -160,3 +161,31 @@ def load_version_dataframe(
         )
 
     return version, df
+def get_next_model_version(
+    model_name: str,
+    db: Session
+) -> str:
+
+    latest = (
+        db.query(TrainedModel)
+        .filter(
+            TrainedModel.name == model_name
+        )
+        .order_by(
+            TrainedModel.id.desc()
+        )
+        .first()
+    )
+
+    if not latest:
+        return "v1"
+
+    try:
+        current_version = int(
+            latest.version.lstrip("v")
+        )
+
+    except (ValueError, AttributeError):
+        current_version = 0
+
+    return f"v{current_version + 1}"
